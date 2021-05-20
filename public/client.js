@@ -47,6 +47,7 @@ socket.on("finalMsg", (res) => {
 });
 socket.on("con", (res) => {
   document.getElementById("player").textContent = res;
+  document.getElementById("point").innerHTML = "";
 });
 socket.on("end", (res) => {
   document.getElementById("question").textContent = res;

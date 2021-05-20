@@ -20,11 +20,11 @@ io.on("connect", (socket) => {
   function sendNextQuestion() {
     if (index <= 4) {
       io.in("playerRoom").emit("messageP", {
-        question: `Qestion ${index + 1}: ${questions[index].question}`,
+        question: `Question ${index + 1}: ${questions[index].question}`,
         answers: questions[index].answers,
       });
       io.in("viewerRoom").emit("messageV", {
-        question: `Qestion ${index + 1}: ${questions[index].question}`,
+        question: `Question ${index + 1}: ${questions[index].question}`,
       });
     } else {
       io.emit("points", {
@@ -50,7 +50,7 @@ io.on("connect", (socket) => {
     socket.emit("player", "player is connected!");
     if (questions) {
       io.to(socket.id).emit("messageV", {
-        question: `Qestion ${index + 1}: ${questions[index].question}`,
+        question: `Question ${index + 1}: ${questions[index].question}`,
       });
     }
   }
