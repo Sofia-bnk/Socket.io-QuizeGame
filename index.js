@@ -17,6 +17,15 @@ let index = 0;
 io.on("connect", (socket) => {
   console.log(`A client with id ${socket.id} connected!`);
 
+  function givePoints() {
+    io.emit("points", {
+      correct,
+      incorrect,
+    });
+    correct = 0;
+    incorrect = 0;
+  }
+
   function sendNextQuestion() {
     if (index <= 4) {
       io.in("playerRoom").emit("messageP", {
@@ -27,12 +36,7 @@ io.on("connect", (socket) => {
         question: `Question ${index + 1}: ${questions[index].question}`,
       });
     } else {
-      io.emit("points", {
-        correct,
-        incorrect,
-      });
-      correct = 0;
-      incorrect = 0;
+      givePoints();
     }
   }
 
@@ -94,25 +98,32 @@ io.on("connect", (socket) => {
       socket.to("viewerRoom").emit("correctedAns", `${ans}(correct)`);
       correct++;
       index++;
+      sendNextQuestion();
     } else {
       socket.to("viewerRoom").emit("correctedAns", `${ans}(incorrect)`);
       incorrect++;
       index++;
+      sendNextQuestion();
     }
     if (index === 5) {
       io.in("playerRoom").emit("end", "Finished!");
+      player = undefined;
+      ChangingPlayer();
     }
-    sendNextQuestion();
   });
+
+  function ChangingPlayer() {
+    player = undefined;
+    socket.leave("playerRoom");
+    socket.to("viewerRoom").emit("dis", "Player disconnected");
+    index = 0;
+  }
 
   socket.on("disconnect", () => {
     console.log(`A client with id ${socket.id} diconnected!`);
 
     if (player === socket.id) {
-      player = undefined;
-      socket.leave("playerRoom");
-      socket.to("viewerRoom").emit("dis", "Player disconnected");
-      index = 0;
+      ChangingPlayer();
     }
   });
 });
