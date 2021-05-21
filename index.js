@@ -107,12 +107,18 @@ io.on("connect", (socket) => {
     }
     if (index === 5) {
       io.in("playerRoom").emit("end", "Finished!");
-      player = undefined;
       ChangingPlayer();
     }
   });
 
   function ChangingPlayer() {
+    player = undefined;
+    socket.leave("playerRoom");
+    socket.to("viewerRoom").emit("dis", "Game is Over!");
+    index = 0;
+  }
+
+  function PlayerDisconnected() {
     player = undefined;
     socket.leave("playerRoom");
     socket.to("viewerRoom").emit("dis", "Player disconnected");
@@ -123,7 +129,7 @@ io.on("connect", (socket) => {
     console.log(`A client with id ${socket.id} diconnected!`);
 
     if (player === socket.id) {
-      ChangingPlayer();
+      PlayerDisconnected();
     }
   });
 });
